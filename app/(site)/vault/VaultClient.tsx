@@ -109,6 +109,7 @@ export default function VaultClient({ user }: VaultClientProps) {
     const [links, setLinks] = useState<{ id: string; url: string; title?: string }[]>([]);
     const [activeNote, setActiveNote] = useState<Note | null>(null);
     const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+    const [savingNote, setSavingNote] = useState(false);
 
     const src = theme === "dark" ? ("/banner_dark.png") : ("/banner_light.png");
     const src_md = theme === "dark" ? ("/banner_dark_md.png") : ("/banner_light_md.png");
@@ -144,6 +145,8 @@ export default function VaultClient({ user }: VaultClientProps) {
     async function handleSaveNote() {
         if (!noteBody.trim()) return;
 
+        setSavingNote(true);
+
         const res = await fetch("/api/vault/notes", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -153,7 +156,10 @@ export default function VaultClient({ user }: VaultClientProps) {
             }),
         });
 
-        if (!res.ok) return;
+        if (!res.ok) {
+            setSavingNote(false);
+            return;
+        }
 
         const savedNote = await res.json();
 
@@ -169,6 +175,7 @@ export default function VaultClient({ user }: VaultClientProps) {
 
         setNoteTitle("");
         setNoteBody("");
+        setSavingNote(false);
     }
 
 
@@ -287,7 +294,7 @@ export default function VaultClient({ user }: VaultClientProps) {
                         <TabsTrigger value="attachments" className="data-[state=active]:text-background dark:data-[state=active]:text-white rounded-2xl">
                             Attachments
                         </TabsTrigger>
-                        <TabsTrigger value="links" className="data-[state=active]:text-background dark:data-[state=active]:text-white rounded-2xl">
+                        <TabsTrigger value="links" className="data-[state=active]:text-background dark:data-[state=active]:text-white   rounded-2xl">
                             Links
                         </TabsTrigger>
                     </TabsList>
@@ -327,7 +334,7 @@ export default function VaultClient({ user }: VaultClientProps) {
                                             className="w-full h-12 bg-action text-white"
                                         >
                                             <Save className="h-4 w-4 mr-2" />
-                                            Save Note
+                                            {savingNote ? 'Saving...' : 'Save Note'}
                                         </Button>
 
                                     </div>
@@ -417,7 +424,9 @@ export default function VaultClient({ user }: VaultClientProps) {
                                             className="flex flex-col items-center bg-card-overlay justify-center gap-2 p-6 border-2 border-dashed border-overlay rounded-xl cursor-pointer hover:bg-overlay transition my-6"
                                         >
                                             <input {...getInputProps()} />
-                                            <span className="text-sm font-medium">Upload files</span>
+                                            <span className="text-sm font-medium">
+                                                {processingFiles ? 'Uploading...' : 'Upload files'}
+                                            </span>
                                             <span className="text-xs text-gray-primary">
                                                 Images, PDFs, Docs, anything
                                             </span>
