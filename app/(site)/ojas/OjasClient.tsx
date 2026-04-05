@@ -358,7 +358,7 @@ export default function AskOjasPage({ user }: OjasClientProps) {
                                 Disclaimer
                             </p>
                             <p className="text-sm font-semibold text-red-500/60 mt-2 ">
-                                These insights are informational only, not medical advice.
+                                These insights are informational only, not medical or financial advice.
                             </p>
                         </div>
 
